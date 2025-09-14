@@ -1,23 +1,20 @@
 services:
 
   nginx:
-    restart: always
+    restart: unless-stopped
     build: ./requirements/nginx/
     container_name: nginx
     ports:
       - "443:443"
     volumes:
       - nextcloud:/var/www/nextcloud
-      - wordpress:/var/www/html
-      - showcase:/var/www/showcase
     networks:
       - inception
     depends_on:
-      - wordpress
       - nextcloud
 
   mariadb:
-    restart: always
+    restart: unless-stopped
     build: ./requirements/mariadb/
     container_name: mariadb
     env_file: ./.env
@@ -28,75 +25,19 @@ services:
     networks:
       - inception
 
-  wordpress:
-      restart: always
-      build: ./requirements/wordpress/
-      container_name: wordpress
-      env_file: ./.env
-      ports:
-        - "9000:9000"
-      volumes:
-        - nextcloud:/var/www/nextcloud
-        - wordpress:/var/www/html
-      networks:
-        - inception
-      depends_on:
-        - mariadb
-
   nextcloud:
-    restart: always
+    restart: unless-stopped
     build: ./requirements/nextcloud/
     container_name: nextcloud
     env_file: ./.env
     ports:
-      - "9001:9001"
+      - "9000:9000"
     volumes:
       - nextcloud:/var/www/nextcloud
     networks:
       - inception
     depends_on:
       - mariadb
-
-  redis:
-    restart: always
-    build: ./requirements/redis/
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - inception
-
-  proftpd:
-    build: ./requirements/proftpd/
-    container_name: proftpd
-    restart: always 
-    env_file: ./.env
-    volumes:
-      - "wordpress:/var/www/html"
-    ports:
-      - 21:21
-    networks:
-        - inception
-        
-  adminer:
-    build: ./requirements/adminer
-    container_name: adminer
-    restart: always
-    ports:
-      - 9002:9002
-    volumes:
-      - "adminer:/var/www/adminer"
-    networks:
-        - inception
-
-  showcase:
-    build: ./requirements/showcase
-    container_name: showcase
-    restart: always
-    volumes:
-      - showcase:/var/www/showcase
-    networks:
-        - inception
 
 networks:
   inception:
@@ -105,11 +46,6 @@ networks:
 volumes:
   mariadb:
     name: mariadb
-  wordpress:
-    name: wordpress
   nextcloud:
     name: nextcloud
-  adminer:
-    name: adminer
-  showcase:
-    name: showcase
+
