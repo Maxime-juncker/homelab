@@ -42,6 +42,8 @@ chown -R www-data:www-data /var/www/nextcloud
 echo creating external storage
 mkdir /var/www/test
 
+php -d memory_limit=1024M occ config:system:set trusted_domains 1 --value='*' # to access from anywhere
+
 php -d memory_limit=1024M occ app:enable files_external
 
 
