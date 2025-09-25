@@ -3,6 +3,8 @@
 cd /var/www/
 chown -R www-data:root /var/www;
 
+
+
 if [ "$(ls -A /var/www/nextcloud)" ]; then
 	echo nextcloud is already installed!
 	exec php-fpm83 --nodaemonize
@@ -44,8 +46,11 @@ mkdir /var/www/test
 
 php -d memory_limit=1024M occ config:system:set trusted_domains 1 --value='*' # to access from anywhere
 
-php -d memory_limit=1024M occ app:enable files_external
+php -d memory_limit=1024m occ app:enable files_external
 
+
+php -d memory_limit=1024m occ files_external:create music local null::null -c datadir=/var/www/music
+php -d memory_limit=1024m occ files:scan --all
 
 echo "nextcloud ready for use!"
 exec php-fpm83 --nodaemonize

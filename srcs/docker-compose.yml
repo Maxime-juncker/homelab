@@ -13,6 +13,25 @@ services:
     depends_on:
       - nextcloud
 
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      # This is part of my reverse proxy setup; see below.
+      ND_BASEURL: /navidrome
+      # Re-scan the music library every 15 minutes.
+      ND_SCANSCHEDULE: "@every 15m"
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+    volumes:
+      - "navi-data:/data"
+      - "nextcloud-music:/music:ro"
+    networks:
+      - inception
+
   mariadb:
     restart: unless-stopped
     build: ./requirements/mariadb/
@@ -34,6 +53,7 @@ services:
       - "9000:9000"
     volumes:
       - nextcloud:/var/www/nextcloud
+      - nextcloud-music:/var/www/music
     networks:
       - inception
     depends_on:
@@ -48,4 +68,8 @@ volumes:
     name: mariadb
   nextcloud:
     name: nextcloud
+  nextcloud-music:
+    name: nextcloud-music
+  navi-data:
+    name: navi-data
 
