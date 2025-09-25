@@ -7,6 +7,9 @@ chown -R www-data:root /var/www;
 
 if [ "$(ls -A /var/www/nextcloud)" ]; then
 	echo nextcloud is already installed!
+
+	cd /var/www/nextcloud
+	php -d memory_limit=1024m occ files:scan --all
 	exec php-fpm83 --nodaemonize
 fi
 
