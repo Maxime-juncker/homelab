@@ -13,6 +13,14 @@ services:
     depends_on:
       - nextcloud
 
+  tricount:
+    build: ./requirements/tricount/
+    container_name: tricount
+    networks:
+      - inception
+    ports:
+      - "8080:8080"
+
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
@@ -20,9 +28,7 @@ services:
       - "4533:4533"
     restart: unless-stopped
     environment:
-      # This is part of my reverse proxy setup; see below.
       ND_BASEURL: /navidrome
-      # Re-scan the music library every 15 minutes.
       ND_SCANSCHEDULE: "@every 15m"
       ND_LOGLEVEL: info
       ND_SESSIONTIMEOUT: 24h
