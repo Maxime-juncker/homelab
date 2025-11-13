@@ -1,0 +1,138 @@
+
+services:
+  db:
+    image: mariadb
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+        - homelab
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   restart: unless-stopped
+  #   command: redis-server --requirepass mjuncker
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - homelab
+  #
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: unless-stopped
+    user: "33:33"  # www-data
+    environment:
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_DATABASE: nextcloud
+      MYSQL_HOST: db
+      NEXTCLOUD_ADMIN_USER: maxime
+      NEXTCLOUD_ADMIN_PASSWORD: maxime
+      NEXTCLOUD_TRUSTED_DOMAINS: '*'
+    volumes:
+      - nextcloud_data:/var/www/html
+      - ./shared_media:/media
+      - ./nextcloud/post_install.sh:/docker-entrypoint-hooks.d/post-installation/init.sh
+    expose:
+      - 80
+    depends_on:
+      - db
+    networks:
+        - homelab
+
+  # gitlab:
+  #   image: gitlab/gitlab-ce:latest
+  #   container_name: gitlab
+  #   restart: unless-stopped
+  #   hostname: gitlab.maxime.com
+  #   environment:
+  #     GITLAB_OMNIBUS_CONFIG: |
+  #       external_url 'https://gitlab.example.com/gitlab'
+  #       nginx['listen_port'] = 80
+  #       nginx['listen_https'] = true
+  #       nginx['proxy_set_headers'] = {
+  #       "X-Forwarded-Script-Name" => "/gitlab",
+  #       "Host" => "yourdomain.com"
+  #       }
+  #   volumes:
+  #     - gitlab_config:/etc/gitlab
+  #     - gitlab_logs:/var/log/gitlab
+  #     - gitlab_data:/var/opt/gitlab
+  #   networks:
+  #     - homelab
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    user: 1000:1000
+    environment:
+      - BaseUrl=/jellyfin
+    ports:
+      - 8096:8096
+      - 8920:8920  # optional for https
+      - 7359:7359/udp  # for DLNA discovery
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      - ./shared_media:/media
+    networks:
+        - homelab
+
+  tricount:
+    build: ./tricount/
+    container_name: tricount
+    networks:
+      - homelab
+    ports:
+      - "8080:8080"
+
+  # nginx:
+  #   restart: unless-stopped
+  #   build: ./nginx/
+  #   container_name: nginx
+  #   ports:
+  #     - "443:443"
+  #   networks:
+  #     - homelab
+  #   depends_on:
+  #     - nextcloud
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl/nginx.crt:/etc/nginx/ssl/cert.crt:ro
+      - ./nginx/ssl/nginx.key:/etc/nginx/ssl/cert.key:ro
+    depends_on:
+      - nextcloud
+    networks:
+        - homelab
+  
+volumes:
+  db_data:
+  nextcloud_data:
+  redis_data:
+  shared_media:
+  jellyfin_config:
+  jellyfin_cache:
+  gitlab_logs:
+  gitlab_config:
+  gitlab_data:
+
+networks:
+  homelab:
+    driver: bridge
