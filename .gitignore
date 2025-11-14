@@ -2,4 +2,5 @@
 test
 nextcloud_data/
 shared_media/
+nginx/ssl/
 ssl/
