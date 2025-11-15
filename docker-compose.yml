@@ -14,6 +14,23 @@ services:
       - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
         - homelab
+  
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      ND_BASEURL: /navidrome
+      ND_SCANSCHEDULE: "@every 15m"
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+    volumes:
+      - "navi-data:/data"
+      - "./shared_media:/music:ro"
+    networks:
+      - homelab
 
   nextcloud:
     image: nextcloud
@@ -28,6 +45,7 @@ services:
       NEXTCLOUD_ADMIN_USER: ${NXT_USER}
       NEXTCLOUD_ADMIN_PASSWORD: ${NXT_PASS}
       NEXTCLOUD_TRUSTED_DOMAINS: '*'
+      APACHE_HTTP_PORT_NUMBER: 81  # Try this env var first
     volumes:
       - nextcloud_data:/var/www/html
       - ./shared_media:/media
@@ -114,10 +132,8 @@ volumes:
   shared_media:
   jellyfin_config:
   jellyfin_cache:
-  gitlab_logs:
-  gitlab_config:
-  gitlab_data:
   gitea:
+  navi-data:
 
 networks:
   homelab:
