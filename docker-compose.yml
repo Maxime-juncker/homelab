@@ -119,11 +119,34 @@ services:
     image: ghcr.io/kiwix/kiwix-serve:latest
     container_name: kiwix
     volumes:
-      - ./kiwix-data:/data
-    command: "*.zim"
+      - $VOL_PATH/data/zim-files:/data:z
+    command: "--urlRootLocation /kiwix *.zim"
     restart: unless-stopped
     networks:
       - homelab
+
+  file-browser:
+    image: filebrowser/filebrowser:latest
+    container_name: files
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount the directories you want to view
+      - $VOL_PATH/data:/srv/data
+      - file_conf:/srv/config
+      # Persistent database for users and settings
+      - file_db:/database.db
+      # Optional: custom configuration
+      - file_json:/.filebrowser.json
+    environment:
+      - PUID=1000
+      - PGID=1000
+    command: --baseurl /files
+    restart: unless-stopped
+    networks:
+      - homelab
+
+
 
   #   image: ghcr.io/kiwix/kiwix-serve
   #   container_name: kiwix
@@ -140,6 +163,9 @@ services:
 volumes:
   qbittorrent_conf:
   jellyfin_cache:
+  file_conf:
+  file_db:
+  file_json:
 
 networks:
   homelab:
