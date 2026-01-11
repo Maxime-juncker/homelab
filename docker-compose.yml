@@ -10,6 +10,23 @@ services:
     networks:
         - homelab
 
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: homelab
+    environment:
+      - TS_AUTHKEY=$TAILSCALE_KEY
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - tailscale-data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    network_mode: host
+
   tricount:
     build: ./tricount/
     container_name: tricount
@@ -131,12 +148,9 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # Mount the directories you want to view
       - $VOL_PATH/data:/srv/data
       - file_conf:/srv/config
-      # Persistent database for users and settings
       - file_db:/database.db
-      # Optional: custom configuration
       - file_json:/.filebrowser.json
     environment:
       - PUID=1000
@@ -146,25 +160,12 @@ services:
     networks:
       - homelab
 
-
-
-  #   image: ghcr.io/kiwix/kiwix-serve
-  #   container_name: kiwix
-  #   ports:
-  #     - '8080:8080'
-  #   volumes:
-  #     - $VOL_PATH/data/zim-files:/data:z
-  #   command:
-  #     # - '--urlRootLocation=localhost/kiwix/'
-  #     - '*.zim'
-  #   networks:
-  #     - homelab
-
 volumes:
   qbittorrent_conf:
   jellyfin_cache:
   file_conf:
   file_db:
+  tailscale-data:
   file_json:
 
 networks:
