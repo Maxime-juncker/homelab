@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title></title>
+		<link href='https://fonts.googleapis.com/css?family=JetBrains Mono' rel='stylesheet'> </head>
+	<body>
+		<header>
+			<h1>Tricount</h1>
+		</header>
+		<section class="main">
+			<textarea id="ticket-in" cols="35" placeholder="paste ticket here"></textarea>
+
+				<button id="submit-btn">submit</button>
+			<div class="output-container">
+				<div id="item-list" class="result"></div>
+				<div id="res-container" class="res-container">
+				</div>
+				<div class="user-input">
+					<p id="curr-item"> ??? </p>
+					<div id="usr-container" class="btn-container">
+					</div>
+					<div>
+						<input id="new-usr-input" class="new-usr-input" placeholder="enter new user">
+						<button id="clear-usr">clear</button>
+					</div>
+				</div>
+			</div>
+		</section>
+	</body>
+
+	<style>
+
+		:root {
+			--darker: #282828;
+			--dark: #3C3836;
+			--red: #C4534E;
+			--yellow: #D79921;
+			--blue: #7E9E92;
+			--white: #EBDBB2;
+			--green: #B8BB26;
+		}
+
+		.list-container {
+			display: flex;
+			flex-direction: center;
+			justify-content: space-between;
+			font-size: small;
+			max-width: 800px;
+		}
+
+		.list-container:hover {
+			color: var(--yellow);
+			font-weight: bold;
+			cursor: pointer;
+		}
+
+		.list-container-focus {
+			color: var(--red);
+			font-weight: bolder;
+			cursor: pointer;
+		}
+
+		.list-container p {
+			-moz-user-select: none;
+			user-select: none;
+			margin: 0;
+			padding: 0;
+		}
+
+
+		body{
+			background-color: var(--darker);
+			font-family: 'JetBrains Mono';font-size: 17px;
+		}
+
+		h1 {
+			color: var(--white);
+		}
+
+		.main {
+			display: flex;
+			flex-direction: row;
+			justify-content: start;
+			align-items: start;
+			padding-inline: 50px;
+			height: 70vh;
+			gap: 20px;
+		}
+
+
+		.output-container {
+			flex: 1;
+			margin: 0;
+			background-color: var(--dark);
+			height: 103%;
+			border-radius: 6px;
+			border: solid 2px var(--green);
+			color: var(--white);
+
+			display: grid;
+			grid-area: item1;
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: 9fr 1fr; 
+			grid-template-areas:
+				"item1 item3"
+				"item2 item3";
+		}
+		
+		.result {
+			background-color: var(--darker);
+			grid-area: item1;
+			flex: 1;
+
+			padding-inline: 15px;
+			padding-top: 3px;
+			overflow: scroll;
+		}
+
+		.res-container {
+			grid-area: item3;
+			font-size: small;
+			padding-inline: 10px;
+			border-left: solid var(--green) 2px;
+		}
+
+		.user-input {
+			grid-area: item2;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding-inline: 10px;
+			margin-bottom: 10px;
+			align-items: start;
+
+			border-top: solid var(--green) 2px;
+		}
+
+		.new-usr-input {
+			
+		}
+
+		textarea {
+			padding: 10px;
+			color: var(--white);
+			background-color: var(--dark);
+			border: solid 2px var(--blue);
+			height: 100%;
+			resize: horizontal;
+			border-radius: 6px;
+		}
+
+		textarea:focus {
+			outline: none;
+		}
+	</style>
+
+	<script src="./bin/main.js"></script>
+</html>
