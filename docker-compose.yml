@@ -160,6 +160,24 @@ services:
     networks:
       - homelab
 
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SONARR__SERVER__URLBASE=/sonarr
+    volumes:
+      - sonarr_conf:/config
+      - $VOL_PATH/data/media/show:/tv #optional
+      - $VOL_PATH/data/downloads/:/downloads #optional
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    networks:
+      - homelab
+
 volumes:
   qbittorrent_conf:
   jellyfin_cache:
@@ -167,6 +185,7 @@ volumes:
   file_db:
   tailscale-data:
   file_json:
+  sonarr_conf:
 
 networks:
   homelab:
