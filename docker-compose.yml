@@ -78,6 +78,10 @@ services:
     environment:
       - BaseUrl=/jellyfin
     container_name: jellyfin
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "992"  # Change this to match your render group ID
     ports:
       - 8096:8096/tcp
       - 7359:7359/udp
@@ -115,7 +119,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - APP_URL=http://localhost:8081/bookstack
+      - APP_URL=http://homelab.local:8081/bookstack
       - DB_HOST=bookstack_db
       - DB_PORT=3306
       - DB_USERNAME=bookstack
@@ -145,6 +149,7 @@ services:
   file-browser:
     image: filebrowser/filebrowser:latest
     container_name: files
+    user: "0:0"
     ports:
       - "8080:80"
     volumes:
